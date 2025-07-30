@@ -1,0 +1,50 @@
+/* Container to hold the bars and text */
+.logo-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    letter-spacing: 2px; /* Space between characters */
+  }
+  
+  /* Each individual bar container */
+  .bar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end; /* Align bars to the bottom */
+    width: 12px; /* Width of the bar */
+    transition: transform 0.2s ease;
+  }
+  
+  /* Styling for the bars */
+  .bar {
+    width: 100%;
+    transition: height 0.3s ease, background-color 0.3s ease;
+  }
+  
+  /* Text below each bar */
+  .logo-letter {
+    color: #f07878;
+    font-size: 1.5rem; /* Clear and readable text size */
+    transition: color 0.3s ease;
+    margin-top: 5px; /* Add space between bar and text */
+  }
+  
+  /* Highlight the bar color when hovering over the bar container */
+  .bar-container:hover .bar {
+    background-color: #ff6347; /* Change color when hovering over the bar */
+  }
+  
+  /* Highlight the letter color when hovering over the bar container */
+  .bar-container:hover .logo-letter {
+    color: #ff6347; /* Highlight text color on hover */
+  }
+  
+  /* Optionally, add a slight scale effect when hovering */
+  .bar-container:hover {
+    transform: scale(1.1); /* Slightly increase the size of the bar container on hover */
+  }
+  
