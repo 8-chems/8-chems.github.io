@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Layers, FileText, Clock, User, Tag } from 'lucide-react';
 import PDFContent from './PDFContent';
+import { ZoomIn, ZoomOut, RefreshCw } from 'lucide-react';
 
-// Configuration for Git repository
+
 const GIT_CONFIG = {
   baseUrl: 'https://raw.githubusercontent.com/8-chems/myportfolio-src/main/courses',
-  apiBaseUrl: 'https://api.github.com/repos/8-chems/myportfolio-src/contents/courses'
+  structureUrl: 'https://raw.githubusercontent.com/8-chems/myportfolio-src/main/courses/structure.json'
 };
 
-// Map icon names to lucide-react components
 const iconMap = {
   Layers: Layers,
   BookOpen: BookOpen,
   FileText: FileText
 };
 
-// TreeView Component
 const TreeView = ({ modules, onContentChange, loading }) => {
   const [expandedItems, setExpandedItems] = useState(new Set(['fds']));
   const [hoveredModule, setHoveredModule] = useState(null);
@@ -24,11 +23,7 @@ const TreeView = ({ modules, onContentChange, loading }) => {
 
   const toggleExpanded = (id) => {
     const newExpanded = new Set(expandedItems);
-    if (newExpanded.has(id)) {
-      newExpanded.delete(id);
-    } else {
-      newExpanded.add(id);
-    }
+    newExpanded.has(id) ? newExpanded.delete(id) : newExpanded.add(id);
     setExpandedItems(newExpanded);
   };
 
@@ -52,11 +47,9 @@ const TreeView = ({ modules, onContentChange, loading }) => {
             className={`moduleHeader ${hoveredModule === module.id ? 'moduleHeaderHover' : ''}`}
           >
             <div className="moduleHeaderContent">
-              {module.icon && iconMap[module.icon] ? (
-                React.createElement(iconMap[module.icon], { size: 20, className: 'moduleIcon' })
-              ) : (
-                <Layers size={20} className="moduleIcon" />
-              )}
+              {module.icon && iconMap[module.icon]
+                ? React.createElement(iconMap[module.icon], { size: 20, className: 'moduleIcon' })
+                : <Layers size={20} className="moduleIcon" />}
               <span>{module.title}</span>
             </div>
             <span
@@ -68,7 +61,7 @@ const TreeView = ({ modules, onContentChange, loading }) => {
               ▶
             </span>
           </button>
-          
+
           {expandedItems.has(module.id) && (
             <div className="chapterContainer">
               {module.chapters?.map((chapter) => (
@@ -79,14 +72,12 @@ const TreeView = ({ modules, onContentChange, loading }) => {
                     onMouseLeave={() => setHoveredChapter(null)}
                     className={`chapterButton ${hoveredChapter === chapter.id ? 'chapterButtonHover' : ''}`}
                   >
-                    {chapter.icon && iconMap[chapter.icon] ? (
-                      React.createElement(iconMap[chapter.icon], { size: 16, className: 'chapterIcon' })
-                    ) : (
-                      <BookOpen size={16} className="chapterIcon" />
-                    )}
+                    {chapter.icon && iconMap[chapter.icon]
+                      ? React.createElement(iconMap[chapter.icon], { size: 16, className: 'chapterIcon' })
+                      : <BookOpen size={16} className="chapterIcon" />}
                     <span>{chapter.title}</span>
                   </button>
-                  
+
                   {chapter.exercises?.length > 0 && (
                     <div>
                       {chapter.exercises.map((exercise) => (
@@ -113,23 +104,83 @@ const TreeView = ({ modules, onContentChange, loading }) => {
   );
 };
 
-// Metadata Display Component
-const MetadataPanel = ({ metadata, isVisible, onToggle }) => {
+const MetadataPanel = ({ metadata, isVisible, onToggle, zoomLevel, setZoomLevel }) => {
   const [hoveredHeader, setHoveredHeader] = useState(false);
-  
   if (!metadata) return null;
 
+  const iconButtons = [
+    {
+      Icon: ZoomIn,
+      action: () => setZoomLevel(z => Math.min(z + 0.1, 2)),
+      title: 'Zoom In',
+    },
+    {
+      Icon: ZoomOut,
+      action: () => setZoomLevel(z => Math.max(z - 0.1, 0.5)),
+      title: 'Zoom Out',
+    },
+    {
+      Icon: RefreshCw,
+      action: () => setZoomLevel(1),
+      title: 'Reset Zoom',
+    },
+  ];
+
   return (
-    <div className="metadataPanel" style={{ maxHeight: isVisible ? '400px' : '48px' }}>
+    <div
+      className="metadataPanel"
+      style={{
+        maxHeight: isVisible ? 'none' : '48px',
+        height: isVisible ? 'auto' : '48px',
+        overflow: isVisible ? 'visible' : 'hidden',
+        transition: 'all 0.3s ease'
+      }}
+    >
       <button
         onClick={onToggle}
         onMouseEnter={() => setHoveredHeader(true)}
         onMouseLeave={() => setHoveredHeader(false)}
         className={`metadataHeader ${hoveredHeader ? 'metadataHeaderHover' : ''}`}
       >
-        <div className="moduleHeaderContent">
-          <Tag size={16} className="metadataIcon" />
-          <span>Document Information</span>
+        <div className="moduleHeaderContent" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Tag size={16} className="metadataIcon" />
+            <span>Document Information</span>
+          </div>
+          <div style={{ display: 'flex', padding: '2px', gap: '8px' }}>
+      {iconButtons.map(({ Icon, action, title }, index) => (
+        <button
+          key={index}
+          onClick={(e) => {
+            e.stopPropagation();
+            action();
+          }}
+          title={title}
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            color: 'black',
+            width: '100px',
+            height: '32px',
+            borderRadius: '50%',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'background-color 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+          }}
+        >
+          
+          <Icon size={28} strokeWidth={2.} />
+        </button>
+      ))}
+    </div>
         </div>
         <span
           style={{
@@ -140,62 +191,41 @@ const MetadataPanel = ({ metadata, isVisible, onToggle }) => {
           ▼
         </span>
       </button>
-      
+
       {isVisible && (
-        <div className="metadataContent">
-          <div className="metadataGrid">
-            {metadata.title && (
-              <div>
-                <h4 className="metadataTitle">Title</h4>
-                <p className="metadataText">{metadata.title}</p>
-              </div>
-            )}
-            
-            {metadata.author && (
-              <div className="metadataItem">
-                <User size={14} />
-                <div>
-                  <span className="metadataLabel">Author: </span>
-                  <span className="metadataText">{metadata.author}</span>
-                </div>
-              </div>
-            )}
-            
-            {metadata.lastUpdated && (
-              <div className="metadataItem">
-                <Clock size={14} />
-                <div>
-                  <span className="metadataLabel">Updated: </span>
-                  <span className="metadataText">
-                    {new Date(metadata.lastUpdated).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-            )}
-            
-            {metadata.version && (
-              <div>
-                <span className="metadataLabel">Version: </span>
-                <span className="metadataText">{metadata.version}</span>
-              </div>
-            )}
-          </div>
-          
-          {metadata.description && (
-            <div className="metadataDescriptionContainer">
-              <h4 className="metadataTitle">Description</h4>
-              <p className="metadataDescription">{metadata.description}</p>
+        <div className="metadataContent" style={{ padding: '16px', display: 'block' }}>
+          {metadata.title && (
+            <div style={{ marginBottom: '16px' }}>
+              <h4 className="metadataTitle">Title</h4>
+              <p className="metadataText">{metadata.title}</p>
             </div>
           )}
-          
+          <div className="metadataGrid">
+            {metadata.author && (
+              <div><User size={14} /> <span><strong>Author:</strong> {metadata.author}</span></div>
+            )}
+            {metadata.updated && (
+              <div><Clock size={14} /> <span><strong>Updated:</strong> {new Date(metadata.updated).toLocaleDateString()}</span></div>
+            )}
+            {metadata.version && (
+              <div><Tag size={14} /> <span><strong>Version:</strong> {metadata.version}</span></div>
+            )}
+            {metadata.uploadDate && (
+              <div><Clock size={14} /> <span><strong>Uploaded:</strong> {new Date(metadata.uploadDate).toLocaleDateString()}</span></div>
+            )}
+          </div>
+          {metadata.description && (
+            <div>
+              <h4 className="metadataTitle">Description</h4>
+              <p>{metadata.description}</p>
+            </div>
+          )}
           {metadata.tags && metadata.tags.length > 0 && (
             <div>
               <h4 className="metadataTitle">Tags</h4>
-              <div className="tagContainer">
-                {metadata.tags.map((tag, index) => (
-                  <span key={index} className="pdfviewertag">
-                    {tag}
-                  </span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {metadata.tags.map((tag, idx) => (
+                  <span key={idx} className="tagBadge">{tag}</span>
                 ))}
               </div>
             </div>
@@ -206,7 +236,6 @@ const MetadataPanel = ({ metadata, isVisible, onToggle }) => {
   );
 };
 
-// Enhanced PDF Viewer Component
 const PDFViewer = () => {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -214,215 +243,115 @@ const PDFViewer = () => {
   const [activeContent, setActiveContent] = useState(null);
   const [metadata, setMetadata] = useState(null);
   const [metadataVisible, setMetadataVisible] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
-  // Utility to generate human-readable title from file name
-  const generateTitle = (fileName, type, chapterNumber, exerciseIndex) => {
-    // For exercises, format as "Series X.Y" where X is chapter number, Y is exercise index
-    if (type === 'exercise' && chapterNumber && exerciseIndex !== undefined) {
-      return `Series ${chapterNumber}.${exerciseIndex + 1}`;
-    }
-    
-    // For chapters and modules
-    const nameWithoutExt = fileName.replace(/\.[^/.]+$/, '');
-    if (nameWithoutExt.toLowerCase().startsWith('series')) {
-      return `Series ${nameWithoutExt.match(/\d+/)?.[0] || nameWithoutExt}`;
-    }
-    return nameWithoutExt
-      .replace(/[_-]/g, ' ')
-      .replace(/\b\w/g, char => char.toUpperCase());
-  };
-
-  // Utility to extract numeric identifier from file name
   const getNumberFromFileName = (fileName) => {
     const match = fileName.match(/\d+/);
     return match ? parseInt(match[0], 10) : null;
   };
 
-  // Fetch modules data from Git repository
+  const generateTitle = (fileName) => {
+    const name = fileName.replace(/\.[^/.]+$/, '');
+    return name.replace(/[_-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  };
+
+  const fetchMetadata = async (content) => {
+    try {
+      const response = await fetch(content.metadataUrl);
+      const data = await response.json();
+      setMetadata({
+        title: data.title || content.title,
+        author: data.author || 'Chemseddine',
+        updated: data.updated || new Date().toISOString(),
+        description: data.description || '',
+        tags: data.tags || [],
+        version: data.version || '1.0',
+        uploadDate: data.uploadDate || data.updated || new Date().toISOString()
+      });
+    } catch {
+      setMetadata({
+        title: content.title,
+        author: 'Chemseddine',
+        updated: new Date().toISOString(),
+        description: `Document about ${content.title}`,
+        tags: [],
+        version: '1.0',
+        uploadDate: new Date().toISOString()
+      });
+    }
+  };
+
   const fetchModulesData = async () => {
     try {
-      setLoading(true);
+      const res = await fetch(GIT_CONFIG.structureUrl);
+      const data = await res.json();
 
-      // Fetch list of course folders
-      const coursesResponse = await fetch(GIT_CONFIG.apiBaseUrl);
-      if (!coursesResponse.ok) {
-        throw new Error(`Failed to fetch courses: ${coursesResponse.status}`);
+      const modules = data.map(course => {
+        const lectures = [];
+        const exercises = [];
+
+        course.files.forEach(file => {
+          const item = {
+            id: `${course.id}_${file.name}`,
+            title: generateTitle(file.name),
+            pdfUrl: file.url,
+            metadataUrl: file.metadata,
+            type: file.type,
+            moduleId: course.id,
+            fileName: file.name
+          };
+          file.type === 'lecture' ? lectures.push(item) : exercises.push(item);
+        });
+
+        const chapters = lectures.map((lecture, i) => {
+          const related = exercises.filter(ex => getNumberFromFileName(ex.fileName) === getNumberFromFileName(lecture.fileName));
+          return { ...lecture, id: `${course.id}_chapter${i + 1}`, exercises: related };
+        });
+
+        return { id: course.id, title: course.title, icon: 'Layers', chapters };
+      });
+
+      setModules(modules);
+      if (modules.length) {
+        const first = modules[0].chapters[0];
+        setActiveContent(first);
+        fetchMetadata(first);
       }
-      const courses = await coursesResponse.json();
-
-      const modulesData = await Promise.all(
-        courses
-          .filter(item => item.type === 'dir')
-          .map(async (course) => {
-            const courseId = course.name;
-
-            // Fetch lectures
-            const lecturesResponse = await fetch(`${GIT_CONFIG.apiBaseUrl}/${courseId}/lectures`);
-            const lectures = lecturesResponse.ok
-              ? (await lecturesResponse.json()).filter(item => item.name.endsWith('.pdf'))
-              : [];
-
-            // Fetch exercises
-            const exercisesResponse = await fetch(`${GIT_CONFIG.apiBaseUrl}/${courseId}/exercises`);
-            const exercises = exercisesResponse.ok
-              ? (await exercisesResponse.json()).filter(item => item.name.endsWith('.pdf'))
-              : [];
-
-            // Create chapters from lectures
-            const chapters = lectures.map((lecture, index) => {
-              const chapterId = `${courseId}_chapter${index + 1}`;
-              const chapterTitle = generateTitle(lecture.name, 'chapter');
-              const lectureNumber = getNumberFromFileName(lecture.name);
-              const chapterNumber = index + 1; // Chapter number (1-based)
-
-              // Match exercises by numeric identifier (e.g., Series_1.pdf to chapter_1.pdf)
-              let relatedExercises = exercises
-                .filter(ex => {
-                  const exNumber = getNumberFromFileName(ex.name);
-                  return exNumber && lectureNumber && exNumber === lectureNumber;
-                })
-                .map((ex, exIndex) => ({
-                  id: `${chapterId}_ex${exIndex + 1}`,
-                  type: 'exercise',
-                  title: generateTitle(ex.name, 'exercise', chapterNumber, exIndex),
-                  pdfUrl: `/exercises/${ex.name}`,
-                  icon: 'FileText'
-                }));
-
-              // Fallback: Assign exercises in order if no numeric match
-              if (relatedExercises.length === 0 && exercises.length > index) {
-                relatedExercises = [{
-                  id: `${chapterId}_ex${index + 1}`,
-                  type: 'exercise',
-                  title: generateTitle(exercises[index].name, 'exercise', chapterNumber, 0),
-                  pdfUrl: `/exercises/${exercises[index].name}`,
-                  icon: 'FileText'
-                }];
-              }
-
-              return {
-                id: chapterId,
-                type: 'chapter',
-                title: chapterTitle,
-                pdfUrl: `/lectures/${lecture.name}`,
-                icon: 'BookOpen',
-                exercises: relatedExercises
-              };
-            });
-
-            return {
-              id: courseId,
-              title: generateTitle(courseId, 'module'),
-              icon: 'Layers',
-              chapters: chapters.filter(ch => ch.exercises.length > 0 || ch.pdfUrl)
-            };
-          })
-      );
-
-      const filteredModules = modulesData.filter(module => module.chapters.length > 0);
-      setModules(filteredModules);
-
-      // Set initial content
-      if (filteredModules.length > 0 && filteredModules[0].chapters?.length > 0) {
-        const firstChapter = filteredModules[0].chapters[0];
-        setActiveContent(firstChapter);
-        await fetchMetadata(firstChapter);
-      } else {
-        setError('No chapters or exercises found in the repository');
-      }
-
     } catch (err) {
-      setError(`Failed to load modules data: ${err.message}`);
-      console.error('Error fetching modules:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch metadata for a specific content item
-  const fetchMetadata = async (content) => {
-    if (!content || !content.id || !content.moduleId) {
-      setMetadata({ title: content?.title || 'Untitled' });
-      return;
-    }
-    
-    try {
-      const metadataFileName = `${content.id}.md`;
-      const metadataUrl = `${GIT_CONFIG.baseUrl}/${content.moduleId}/metadata/${metadataFileName}`;
-      
-      const response = await fetch(metadataUrl);
-      if (response.ok) {
-        const markdownContent = await response.text();
-        const mockMetadata = {
-          title: content.title,
-          author: content.moduleId === 'fds' ? 'Dr. Data Science' : 'Dr. Machine Learning',
-          lastUpdated: new Date().toISOString(),
-          version: '1.0',
-          description: `This document covers ${content.title.toLowerCase()} with comprehensive examples and exercises.`,
-          tags: content.type === 'chapter' ? ['lecture', 'theory', 'fundamentals'] : ['exercise', 'practice', 'homework'],
-          difficulty: content.type === 'chapter' ? 'Intermediate' : 'Beginner',
-          estimatedTime: content.type === 'chapter' ? '45 minutes' : '30 minutes'
-        };
-        setMetadata(mockMetadata);
-      } else {
-        setMetadata({ title: content.title });
-      }
-      
-    } catch (err) {
-      console.error('Error fetching metadata:', err);
-      setMetadata({ title: content.title });
-    }
-  };
-
-  // Handle content change
   const handleContentChange = async (content) => {
-    setActiveContent({
-      ...content,
-      pdfUrl: content.pdfUrl.startsWith('http')
-        ? content.pdfUrl
-        : `${GIT_CONFIG.baseUrl}/${content.moduleId}${content.pdfUrl}`
-    });
+    setActiveContent(content);
     await fetchMetadata(content);
   };
 
-  // Initialize data on component mount
   useEffect(() => {
     fetchModulesData();
   }, []);
 
-  if (error) {
-    return (
-      <div className="errorContainer">
-        <div className="errorContent">
-          <div className="errorIcon">⚠️</div>
-          <p className="errorText">{error}</p>
-          <button 
-            onClick={fetchModulesData}
-            className="retryButton"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="pdfviewercontainer">
       <div className="treeContainer">
-        <TreeView
-          modules={modules}
-          onContentChange={handleContentChange}
-          loading={loading}
-        />
+        <TreeView modules={modules} onContentChange={handleContentChange} loading={loading} />
       </div>
+
       <div className="viewerContainer">
-        <MetadataPanel 
-          metadata={metadata} 
+        <MetadataPanel
+          metadata={metadata}
           isVisible={metadataVisible}
           onToggle={() => setMetadataVisible(!metadataVisible)}
+          zoomLevel={zoomLevel}
+          setZoomLevel={setZoomLevel}
         />
-        <PDFContent activeContent={activeContent} />
+        <div style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left', transition: 'transform 0.2s ease' }}>
+          <PDFContent activeContent={activeContent} />
+        </div>
       </div>
     </div>
   );
