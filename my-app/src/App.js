@@ -50,19 +50,9 @@ function App() {
   return (
     <div>
       <NavBar onNavClick={handleNavClick} />
-      {activeSection != 'Lectures' && <Header />}
-      {activeSection === 'Lectures' && <Breadcrumb />}
+ <Header />
+      
 
-
-      {/*activeSection === 'Lectures' && <TeachingMaterialSection />*/}
-
-      <div className="teaching-content-wrapper" style={{ marginTop: '70px' }}>
-        <main id="teaching-content">
-          {activeSection === 'Lectures' && <DocumentViewer />}
-
-        </main>
-      </div>
-      {activeSection != 'Lectures' &&
         <div className="content-wrapper" style={{ marginTop: '70px' }}>
 
           {/*activeSection != 'Lectures' && <Breadcrumb />*/}
@@ -83,7 +73,7 @@ function App() {
           </main>
 
         </div>
-      }
+      
 
       <Footer isFullWidth={activeSection === 'Lectures' ? true : false} />
     </div>

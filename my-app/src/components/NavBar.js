@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import LOGO from './sections/logo';
+import LOGO from "./sections/logo";
 
 function NavBar({ onNavClick }) {
   const [activePage, setActivePage] = useState(1);
@@ -15,20 +15,25 @@ function NavBar({ onNavClick }) {
     { page: 7, label: "Projects" },
     { page: 8, label: "News" },
     { page: 9, label: "Tools", disabled: true },
-    { page: 10, label: "Lectures" },
+    { page: 10, label: "Lectures", link: "https://8-chems.github.io/lectures/" },
     { page: 11, label: "CV" },
     { page: 12, label: "Contact" },
   ];
 
-  const handleClick = (page) => {
-    setActivePage(page);
-    setIsCollapsed(false); // Collapse the menu after clicking a link
-    onNavClick(menuItems.find((item) => item.page === page).label); // Notify parent component
+  const handleClick = (item) => {
+    setActivePage(item.page);
+    setIsCollapsed(false);
+
+    if (item.link) {
+      // Redirect to external Quarto page
+      window.location.href = item.link;
+    } else {
+      // Notify parent for normal internal navigation
+      onNavClick(item.label);
+    }
   };
 
-  const toggleCollapse = () => {
-    setIsCollapsed((prevState) => !prevState); // Toggle the collapsed state
-  };
+  const toggleCollapse = () => setIsCollapsed((prev) => !prev);
 
   return (
     <nav className="navbar navbar-expand-md navbar-dark bg-dark fixed-top shadow-sm">
@@ -51,21 +56,24 @@ function NavBar({ onNavClick }) {
         </button>
 
         {/* Collapsible Menu */}
-        <div className={`collapse navbar-collapse ${isCollapsed ? "show" : ""}`} id="navbarToggler">
+        <div
+          className={`collapse navbar-collapse ${isCollapsed ? "show" : ""}`}
+          id="navbarToggler"
+        >
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
             {menuItems.map((item) => (
               <li className="nav-item" key={item.page}>
                 <a
-                  href="#"
-                  className={`nav-link ${activePage === item.page ? "active" : ""} ${item.disabled ? "disabled" : ""}`}
+                  href={item.link || "#"}
+                  className={`nav-link ${activePage === item.page ? "active" : ""} ${
+                    item.disabled ? "disabled" : ""
+                  }`}
                   onClick={(e) => {
-                    e.preventDefault(); // Prevent default anchor behavior
-                    if (!item.disabled) {
-                      handleClick(item.page); // Handle click and notify parent
-                    }
+                    e.preventDefault();
+                    if (!item.disabled) handleClick(item);
                   }}
                   aria-disabled={item.disabled}
-                  tabIndex={item.disabled ? -1 : 0} // Prevent focus on disabled items
+                  tabIndex={item.disabled ? -1 : 0}
                 >
                   {item.label}
                 </a>
