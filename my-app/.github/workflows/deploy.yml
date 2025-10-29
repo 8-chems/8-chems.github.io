@@ -3,7 +3,7 @@ name: Build and Deploy React App
 on:
   push:
     branches:
-      - master  # or main
+      - develop
   workflow_dispatch:
 
 jobs:
