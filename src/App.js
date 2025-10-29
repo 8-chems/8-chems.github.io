@@ -29,7 +29,6 @@ import NewsSection from "./components/sections/NewsSection"
 import CVSection from "./components/sections/CVSection"
 import ContactSection from './components/ContactSection';
 
-import DocumentViewer from './components/sections/DocumentViewer';
 
 
 
