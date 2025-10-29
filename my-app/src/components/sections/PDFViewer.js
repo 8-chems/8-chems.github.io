@@ -147,40 +147,40 @@ const MetadataPanel = ({ metadata, isVisible, onToggle, zoomLevel, setZoomLevel 
             <Tag size={16} className="metadataIcon" />
             <span>Document Information</span>
           </div>
-          <div style={{ display: 'flex', padding: '2px', gap: '8px' }}>
-      {iconButtons.map(({ Icon, action, title }, index) => (
-        <button
-          key={index}
-          onClick={(e) => {
-            e.stopPropagation();
-            action();
-          }}
-          title={title}
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-            color: 'black',
-            width: '100px',
-            height: '32px',
-            borderRadius: '50%',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'background-color 0.2s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-          }}
-        >
-          
-          <Icon size={28} strokeWidth={2.} />
-        </button>
-      ))}
-    </div>
+          <div style={{ display: 'flex', padding: '0px', gap: '2px' }}>
+  {iconButtons.map(({ Icon, action, title }, index) => (
+    <button
+      key={index}
+      onClick={(e) => {
+        e.stopPropagation();
+        action();
+      }}
+      title={title}
+      style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        color: 'black',
+        
+        height: '32px',
+        borderRadius: '100%',
+        border: 'none',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'background-color 0.2s',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+      }}
+    >
+      <Icon size={18} color="black" />
+    </button>
+  ))}
+</div>
+
         </div>
         <span
           style={{

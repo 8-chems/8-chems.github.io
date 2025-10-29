@@ -15,7 +15,7 @@ function NavBar({ onNavClick }) {
     { page: 7, label: "Projects" },
     { page: 8, label: "News" },
     { page: 9, label: "Tools", disabled: true },
-    { page: 10, label: "Teaching Material" },
+    { page: 10, label: "Lectures" },
     { page: 11, label: "CV" },
     { page: 12, label: "Contact" },
   ];
