@@ -28,6 +28,67 @@ const MarkdownRenderer = ({ content }) => {
   return <div className="prose max-w-none">{renderMarkdown(content)}</div>;
 };
 
+// Project Card Image with Placeholder
+const CardImage = ({ src, alt }) => {
+  const [imgFailed, setImgFailed] = useState(false);
+
+  const showPlaceholder = !src || imgFailed;
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "160px",
+        overflow: "hidden",
+        borderBottom: "1px solid #e5e7eb",
+        background: "#f3f4f6",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "8px",
+        flexShrink: 0,
+      }}
+    >
+      {!showPlaceholder && (
+        <img
+          src={src}
+          alt={alt}
+          onError={() => setImgFailed(true)}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+      )}
+      {showPlaceholder && (
+        <>
+          <svg
+            width="36"
+            height="36"
+            viewBox="0 0 36 36"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ opacity: 0.25 }}
+          >
+            <rect x="2" y="6" width="32" height="24" rx="3" stroke="currentColor" strokeWidth="2" />
+            <circle cx="12" cy="14" r="3" stroke="currentColor" strokeWidth="2" />
+            <path
+              d="M2 26l8-6 6 5 5-4 13 9"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span style={{ fontSize: "12px", color: "#9ca3af" }}>No image yet</span>
+        </>
+      )}
+    </div>
+  );
+};
+
 // Main Component
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -144,7 +205,12 @@ const Projects = () => {
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project, index) => (
               <div key={index} className="col">
-                <div className="card h-100" onClick={() => handleShowModal(project)} style={{ cursor: "pointer" }}>
+                <div
+                  className="card h-100"
+                  onClick={() => handleShowModal(project)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <CardImage src={project.image} alt={`${project.title} preview`} />
                   <div className="card-body">
                     <h3 className="card-title h5 mb-3 fw-bold">{project.title}</h3>
                     <p className="text-muted mb-1"><strong>Institute:</strong> {project.institute}</p>
@@ -156,7 +222,12 @@ const Projects = () => {
                     </div>
                     <p><strong>Description:</strong> {project.description}</p>
                     {project.link && (
-                      <p><strong>Link:</strong> <a href={project.link} onClick={(e) => e.stopPropagation()} target="_blank" rel="noreferrer">{project.link}</a></p>
+                      <p>
+                        <strong>Link:</strong>{" "}
+                        <a href={project.link} onClick={(e) => e.stopPropagation()} target="_blank" rel="noreferrer">
+                          {project.link}
+                        </a>
+                      </p>
                     )}
                     <div className="d-flex flex-wrap gap-2 mt-2">
                       {project.tags.map((tag, i) => (
@@ -175,7 +246,11 @@ const Projects = () => {
         </div>
 
         {/* Modal */}
-        <div className={`modal fade ${showModal ? "show d-block" : ""}`} tabIndex="-1" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+        <div
+          className={`modal fade ${showModal ? "show d-block" : ""}`}
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+        >
           <div className="modal-dialog modal-lg">
             <div className="modal-content">
               <div className="modal-header">

@@ -28,6 +28,67 @@ const MarkdownRenderer = ({ content }) => {
   return <div className="prose max-w-none">{renderMarkdown(content)}</div>;
 };
 
+// News Card Image with Placeholder
+const CardImage = ({ src, alt }) => {
+  const [imgFailed, setImgFailed] = useState(false);
+
+  const showPlaceholder = !src || imgFailed;
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "160px",
+        overflow: "hidden",
+        borderBottom: "1px solid #e5e7eb",
+        background: "#f3f4f6",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "8px",
+        flexShrink: 0,
+      }}
+    >
+      {!showPlaceholder && (
+        <img
+          src={src}
+          alt={alt}
+          onError={() => setImgFailed(true)}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+      )}
+      {showPlaceholder && (
+        <>
+          <svg
+            width="36"
+            height="36"
+            viewBox="0 0 36 36"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ opacity: 0.25 }}
+          >
+            <rect x="2" y="6" width="32" height="24" rx="3" stroke="currentColor" strokeWidth="2" />
+            <circle cx="12" cy="14" r="3" stroke="currentColor" strokeWidth="2" />
+            <path
+              d="M2 26l8-6 6 5 5-4 13 9"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span style={{ fontSize: "12px", color: "#9ca3af" }}>No image yet</span>
+        </>
+      )}
+    </div>
+  );
+};
+
 const NewsSection = () => {
   const [newsItems, setNewsItems] = useState([]);
   const [activeNews, setActiveNews] = useState(null);
@@ -118,6 +179,7 @@ const NewsSection = () => {
                   onClick={() => handleClick(news)}
                   style={{ cursor: "pointer" }}
                 >
+                  <CardImage src={news.image} alt={`${news.title} preview`} />
                   <div className="card-body">
                     <h5 className="card-title fw-bold">{news.title}</h5>
                     <p className="text-muted mb-1">

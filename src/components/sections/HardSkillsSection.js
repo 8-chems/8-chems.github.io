@@ -19,7 +19,7 @@ const HardSkills = () => {
   return (
     <div className="page active px-3 py-5" id="page-6">
       <h2 className="fw-bold mb-5 text-center text-primary" id="dev_skills">
-        🛠️ Hard Skills
+        
       </h2>
 
       {skills.map((skill, index) => (
